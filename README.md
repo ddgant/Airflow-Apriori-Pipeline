@@ -91,89 +91,53 @@ TransactionID,Items
 ### Installation
 
 1. **Clone the repository**
-```bash
-git clone <your-repository>
-cd movie_rental_apriori
-```
+   ```bash
+   git clone <your-repository>
+   cd movie_rental_apriori
+   ```
 
-2. **Create virtual environment**
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+2. **Start the environment**
+   
+   Run the following command to build the image and start the containers:
+   ```bash
+   docker-compose up --build
+   ```
+   
+   Wait until the logs stabilize and you see "Listening at..."
 
-3. **Install dependencies**
-```bash
-pip install apache-airflow
-pip install pandas
-```
+3. **Create the Admin User**
+   
+  Open a new terminal inside the project folder and run:
+  ```bash
+  docker-compose exec airflow-webserver airflow users create \
+      --username admin \
+      --firstname Admin \
+      --lastname User \
+      --role Admin \
+      --email admin@example.com \
+      --password admin
+  ```
 
-4. **Configure Airflow**
-```bash
-# Initialize Airflow database
-airflow db init
+4. **Access the Pipeline**
 
-# Create admin user
-airflow users create \
-    --username admin \
-    --firstname Admin \
-    --lastname User \
-    --role Admin \
-    --email admin@example.com \
-    --password admin
-```
+   - Open your browser at: `http://localhost:8080`
+   - Login: `admin` / `admin`
+   - Search for DAG: `movie_rental_apriori_pipeline`
+   - Toggle the switch to ON and click the Play button (Trigger DAG)
 
-5. **Set AIRFLOW_HOME environment variable**
-```bash
-export AIRFLOW_HOME=~/airflow  # On Windows: set AIRFLOW_HOME=%USERPROFILE%\airflow
-```
+### Optional: Run Individual Scripts (For Testing)
 
-6. **Copy DAG to Airflow directory**
-```bash
-cp dags/apriori_pipeline_dag.py $AIRFLOW_HOME/dags/
-```
-
----
-
-## 🚀 How to Run
-
-### Option 1: Run with Airflow (Recommended)
-
-1. **Start Airflow webserver**
-```bash
-airflow webserver --port 8080
-```
-
-2. **In another terminal, start the scheduler**
-```bash
-airflow scheduler
-```
-
-3. **Access web interface**
-- Open browser at: `http://localhost:8080`
-- Login: `admin` / `admin`
-
-4. **Execute the DAG**
-- Search for DAG: `movie_rental_apriori_pipeline`
-- Activate toggle to enable it
-- Click "Trigger DAG" to run manually
-
-### Option 2: Run Individual Scripts (For Testing)
+If you want to test scripts individually without Airflow:
 
 ```bash
-# From project root directory
+# Enter the container
+docker-compose exec airflow-webserver bash
 
-# 1. Load data
-python scripts/load_data.py
-
-# 2. Clean data
-python scripts/clean_data.py
-
-# 3. Run Apriori
-python scripts/apriori.py
-
-# 4. Generate reports
-python scripts/generate_report.py
+# Then run scripts
+python /opt/airflow/scripts/load_data.py
+python /opt/airflow/scripts/clean_data.py
+python /opt/airflow/scripts/apriori.py
+python /opt/airflow/scripts/generate_report.py
 ```
 
 ---
@@ -207,6 +171,9 @@ movie_rental_apriori/
 │   ├── apriori.py                    # Apriori implementation
 │   └── generate_report.py            # Report generator
 │
+├── Dockerfile                         # Docker image definition
+├── docker-compose.yaml                # Docker orchestration
+├── requirements.txt                   # Python dependencies
 └── README.md                          # This file
 ```
 
