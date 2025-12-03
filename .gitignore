@@ -1,0 +1,15 @@
+# Python caches
+__pycache__/
+*.pyc
+
+# Airflow / Docker logs
+logs/
+plugins/
+
+# Result folders (Queremos que el usuario genere esto, no subir los nuestros)
+data/processed/*
+data/results/*
+
+# System files
+.DS_Store
+Thumbs.db
